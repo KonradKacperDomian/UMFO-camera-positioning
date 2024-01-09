@@ -5,10 +5,10 @@ import complementary_filter as cp
 
 class IMU_Filter:
 
-    def __init__(self, measurements_num, alpha, theta_min, highpass, lowpass):
+    def __init__(self, measurements_num, sampling_period, alpha=0.9, theta_min=1e-6, highpass=.01, lowpass=.05):
         self.accData = np.array(np.zeros((measurements_num, 3)))
         self.gyroData = np.array(np.zeros((measurements_num, 3)))
-        self.timestamps = np.array(np.zeros((measurements_num,)))
+        self.timestamps = [sampling_period] * (measurements_num-1)
         self.alpha = alpha
         self.theta_min = theta_min
         self.highpass = highpass
@@ -18,10 +18,8 @@ class IMU_Filter:
         # shift measurements by one time step
         self.accData = np.roll(self.accData, -1, axis=1)
         self.gyroData = np.roll(self.gyroData, -1, axis=1)
-        self.timestamps = np.roll(self.timestamps, -1)
 
         # append new data
-        self.timestamps[-1] = timestamp
         self.accData[-1, 0] = acceleration[0]
         self.accData[-1, 1] = acceleration[1]
         self.accData[-1, 2] = acceleration[2]
@@ -31,7 +29,7 @@ class IMU_Filter:
 
         (q, a) = cp.estimate_orientation(a=self.accData,
                                                  w=self.gyroData,
-                                                 t=self.timestamps,
+                                                 dt=self.timestamps,
                                                  alpha=self.alpha,
                                                  theta_min=self.theta_min,
                                                  highpass=self.highpass,
