@@ -67,4 +67,4 @@ def estimate_orientation(a, w, t, alpha=0.9, g_ref=(0., 0., 1.),
         # fuse both estimates
         q[i] = q_a * q_w
 
-    return q
+    return q, a
