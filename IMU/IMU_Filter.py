@@ -5,9 +5,11 @@ import complementary_filter as cp
 
 class IMU_Filter:
 
-    def __init__(self, measurements_num=10, alpha=0.9, g_ref=(0., 0., 1.), theta_min=1e-6, highpass=.01, lowpass=.05):
+    def __init__(self, sampling_period=0.002, measurements_num=10, alpha=0.9, g_ref=(0., 0., 1.), theta_min=1e-6, highpass=.01, lowpass=.05):
         """
         Initialises the IMU filter class
+        :param sampling_period: float, default 0.002
+            Sampling period of the orientation sensor in seconds.
         :param measurements_num: int, default 10
             Number of the past measurements that are fed to the filter
         :param alpha: float, default 0.9
@@ -33,11 +35,10 @@ class IMU_Filter:
         self.highpass = highpass
         self.lowpass = lowpass
 
-    def get_next_value(self, timestamp, acceleration, rotation):
+    def get_next_value(self, acceleration, rotation):
         """
         Filters incoming accelerometer and gyroscope data. Appends measurements to internal
         arrays that are then passed to a complementary filter.
-        :param timestamp: Timestamp of current measurement (in s)
         :param acceleration: 3-element array with acceleration values (arbitrary values)
         :param rotation: 3-element array with angular velocity measurements (in rad/s).
         :return:
@@ -58,7 +59,7 @@ class IMU_Filter:
 
         (q, a) = cp.estimate_orientation(a=self.accData,
                                          w=self.gyroData,
-                                         t=self.timestamps,
+                                         dt=self.timestamps,
                                          alpha=self.alpha,
                                          g_ref=self.g_ref,
                                          theta_min=self.theta_min,

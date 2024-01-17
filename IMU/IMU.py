@@ -23,6 +23,7 @@ import math
 import time
 import numpy as np
 # from test import quaternion_to_rotation_matrix, acceleration_from_imu
+from IMU_Filter import IMU_Filter
 def quaternion_to_rotation_matrix(q):
     """
     Konwertuje kwaternion na macierz obrotu.
@@ -62,8 +63,10 @@ class IMU_thread(threading.Thread):
         self.bno = BNO08X_I2C(self.i2c)                     # Initialize BNO08X driver
         self.bno.initialize()
         self.accel_sampling_period = 1/500                  # Maximum sampling rate of Accelerometer
-        # imu_filter = IMU_Filter(100, self.accel_sampling_period)
+        self.imu_filter = IMU_Filter(measurements_num=100)
 
+        self.rotation = [0.0, 0.0, 0.0] # used in run() methond in while loop. Pycharm was warning that it was not defined
+                                        # in constructor, so defined it here
         self.current_speed = [0.0, 0.0, 0.0]
         self.current_position = [0.0, 0.0, 0.0]
         self.current_rotation = [0.0, 0.0, 0.0]
@@ -182,7 +185,11 @@ class IMU_thread(threading.Thread):
             accelerometer = self.bno.acceleration
             quaternion = self.bno.quaternion
             self.rotation = self.convert_quaternion_to_euler_degrees(quaternion)
-            # imu_filter.get_next_value(self.accel_sampling_period, accelerometer, rotation)
+            rotation_rate = self.bno.gyro()
+
+            filtered_quaternion, filtered_acceleration = self.imu_filter.get_next_value(accelerometer, rotation_rate)
+            self.rotation = self.convert_quaternion_to_euler_degrees(filtered_quaternion)
+            accelerometer = filtered_acceleration
 
             gravity_vector = np.array([-9.8235, 0.0, 0.0])  # Wektor grawitacyjny w układzie odniesienia
             result = acceleration_from_imu(quaternion, gravity_vector) # Oblicz przyspieszenie ziemskie na każdą oś
