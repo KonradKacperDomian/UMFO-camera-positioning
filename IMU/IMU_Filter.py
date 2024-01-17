@@ -26,7 +26,7 @@ class IMU_Filter:
         """
         self.accData = np.array(np.zeros((measurements_num, 3)))
         self.gyroData = np.array(np.zeros((measurements_num, 3)))
-        self.timestamps = np.array(np.zeros((measurements_num,)))
+        self.timestamps = [sampling_period] * (measurements_num-1)
         self.alpha = alpha
         self.g_ref = g_ref
         self.theta_min = theta_min
@@ -47,10 +47,8 @@ class IMU_Filter:
         # shift measurements by one time step
         self.accData = np.roll(self.accData, -1, axis=1)
         self.gyroData = np.roll(self.gyroData, -1, axis=1)
-        self.timestamps = np.roll(self.timestamps, -1)
 
         # append new data
-        self.timestamps[-1] = timestamp
         self.accData[-1, 0] = acceleration[0]
         self.accData[-1, 1] = acceleration[1]
         self.accData[-1, 2] = acceleration[2]

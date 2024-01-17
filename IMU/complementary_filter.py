@@ -3,7 +3,7 @@ from scipy.signal import filtfilt, butter
 from quaternion import quaternion, from_rotation_vector, rotate_vectors
 
 
-def estimate_orientation(a, w, t, alpha=0.9, g_ref=(0., 0., 1.),
+def estimate_orientation(a, w, dt, alpha=0.9, g_ref=(0., 0., 1.),
                          theta_min=1e-6, highpass=.01, lowpass=.05):
     """ Estimate orientation with a complementary filter.
     Fuse linear acceleration and angular velocity measurements to obtain an
@@ -39,8 +39,8 @@ def estimate_orientation(a, w, t, alpha=0.9, g_ref=(0., 0., 1.),
     """
 
     # initialize some things
-    N = len(t)
-    dt = np.diff(t)
+    N = len(dt) + 1
+    # dt = np.diff(t)
     g_ref = np.array(g_ref)
     q = np.ones(N, dtype=quaternion)
 
