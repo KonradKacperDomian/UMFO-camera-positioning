@@ -59,13 +59,13 @@ class IMU_Filter:
         self.gyroData[-1, 2] = rotation[2]
 
         (q, a) = cp.estimate_orientation(a=self.accData,
-                                                 w=self.gyroData,
-                                                 t=self.timestamps,
-                                                 alpha=self.alpha,
-                                                 g_ref=self.g_ref,
-                                                 theta_min=self.theta_min,
-                                                 highpass=self.highpass,
-                                                 lowpass=self.lowpass)
+                                         w=self.gyroData,
+                                         t=self.timestamps,
+                                         alpha=self.alpha,
+                                         g_ref=self.g_ref,
+                                         theta_min=self.theta_min,
+                                         highpass=self.highpass,
+                                         lowpass=self.lowpass)
         # return estimation of last measurements
         return q[-1], a[-1]
 
