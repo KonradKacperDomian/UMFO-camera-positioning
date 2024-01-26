@@ -17,7 +17,7 @@ def estimate_orientation(a, w, dt, alpha=0.9, g_ref=(0., 0., 1.),
         Acceleration measurements (in arbitrary units).
     w : array-like, shape (N, 3)
         Angular velocity measurements (in rad/s).
-    dt : array-like, shape (N,)
+    t : array-like, shape (N,)
         Timestamps of the measurements (in s).
     alpha : float, default 0.9
         Weight of the angular velocity measurements in the estimate.
